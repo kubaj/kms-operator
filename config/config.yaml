@@ -1,0 +1,3 @@
+apiVersion: kubaj.kms/v1alpha1
+kind: SecretKMS
+projectName: kms-operator
