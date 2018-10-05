@@ -254,6 +254,12 @@
   revision = "2f84ea8ef8720b418a1414ed610df828e1db1b3b"
 
 [[projects]]
+  branch = "master"
+  name = "google.golang.org/api"
+  packages = ["cloudkms/v1","gensupport","googleapi","googleapi/internal/uritemplates"]
+  revision = "f5c49d98d21cc639f7ba8c7e4b127e88ee2af7ed"
+
+[[projects]]
   name = "google.golang.org/appengine"
   packages = [".","internal","internal/app_identity","internal/base","internal/datastore","internal/log","internal/modules","internal/remote_api","internal/urlfetch","urlfetch"]
   revision = "ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06"
@@ -306,6 +312,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e361a093e684918f404bb69a696fa2e91743be7625093c64a7a19444621b8b0a"
+  inputs-digest = "03dd3a6fccd286c059450d50fb467a0029026ae6f7377843aca9b27b197f5370"
   solver-name = "gps-cdcl"
   solver-version = 1
