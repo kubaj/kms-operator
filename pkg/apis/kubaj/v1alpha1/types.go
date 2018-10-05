@@ -22,8 +22,23 @@ type SecretKMS struct {
 }
 
 type SecretKMSSpec struct {
-	// Fill me
+	Secret   string      `json:"secret"`
+	File     string      `json:"file"`
+	Provider KMSProvider `json:"provider"`
 }
+
+type KMSProvider struct {
+	GoogleCloud *GoogleCloudProvider `json:"google-cloud"`
+}
+
+type GoogleCloudProvider struct {
+	Project  string `json:"project"`
+	Location string `json:"location"`
+	Keyring  string `json:"keyring"`
+	Key      string `json:"key"`
+	Data     string `json:"data"`
+}
+
 type SecretKMSStatus struct {
 	// Fill me
 }
