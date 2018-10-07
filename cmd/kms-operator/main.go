@@ -2,18 +2,23 @@ package main
 
 import (
 	"context"
+	"flag"
 	"runtime"
 	"time"
 
 	stub "github.com/kubaj/kms-operator/pkg/stub"
+	"github.com/kubaj/kms-operator/utils/clients"
 	sdk "github.com/operator-framework/operator-sdk/pkg/sdk"
 	k8sutil "github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
-	"golang.org/x/oauth2/google"
-	cloudkms "google.golang.org/api/cloudkms/v1"
 
 	"github.com/sirupsen/logrus"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+)
+
+var (
+	providerGoogle       = flag.Bool("google-provider", false, "Enable Google Cloud provider")
+	serviceAccountGoogle = flag.String("google-service-account", "", "Path to Google Cloud service acccount to override default service account")
 )
 
 func printVersion() {
@@ -24,14 +29,9 @@ func printVersion() {
 
 func main() {
 	printVersion()
+	flag.Parse()
 
-	ctx := context.Background()
-	client, err := google.DefaultClient(ctx, cloudkms.CloudPlatformScope)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	kmsService, err := cloudkms.New(client)
+	googleCloudKMS, err := clients.GetGoogleCloudKMS(*providerGoogle, *serviceAccountGoogle)
 
 	sdk.ExposeMetricsPort()
 
@@ -46,6 +46,6 @@ func main() {
 	resyncPeriod := time.Duration(60) * time.Second
 	logrus.Infof("Watching %s, %s, %s, %d", resource, kind, namespace, resyncPeriod)
 	sdk.Watch(resource, kind, namespace, resyncPeriod)
-	sdk.Handle(stub.NewHandler(kmsService))
+	sdk.Handle(stub.NewHandler(googleCloudKMS))
 	sdk.Run(context.TODO())
 }
