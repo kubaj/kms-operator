@@ -43,7 +43,7 @@ require (
 	golang.org/x/text v0.3.0
 	golang.org/x/time v0.0.0-20180412165947-fbb02b2291d2
 	golang.org/x/tools v0.0.0-20181003024731-2f84ea8ef872
-	google.golang.org/api v0.0.0-20181003000758-f5c49d98d21c
+	google.golang.org/api v0.0.0-20181010000435-ce4acf611b39
 	google.golang.org/appengine v1.2.0
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.2.1

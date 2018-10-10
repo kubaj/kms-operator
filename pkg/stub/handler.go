@@ -16,6 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// NewHandler constructs Handler
 func NewHandler(cloudKMS *cloudkms.Service) sdk.Handler {
 	return &Handler{
 		CloudKMS: cloudKMS,
@@ -26,6 +27,7 @@ type Handler struct {
 	CloudKMS *cloudkms.Service
 }
 
+// Handle is method for handling all watched events
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
 	case *v1alpha1.SecretKMS:
@@ -46,8 +48,8 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	return nil
 }
 
+// CreateSecret is method that creates v1/Secret according to SecretKMS resource
 func (h *Handler) CreateSecret(cr *v1alpha1.SecretKMS) error {
-
 	secret := &corev1.Secret{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
@@ -68,6 +70,8 @@ func (h *Handler) CreateSecret(cr *v1alpha1.SecretKMS) error {
 		return err
 	}
 
+	logrus.Debugf("Creating Secret from SecretKMS %s", cr.Name)
+
 	parent := fmt.Sprintf("projects/%s/locations/%s/keyRings/%s/cryptoKeys/%s",
 		cr.Spec.Provider.GoogleCloud.Project,
 		cr.Spec.Provider.GoogleCloud.Location,
@@ -79,7 +83,8 @@ func (h *Handler) CreateSecret(cr *v1alpha1.SecretKMS) error {
 	}
 
 	logrus.Debugln("Sending decrypt request")
-	resp, err := h.CloudKMS.Projects.Locations.KeyRings.CryptoKeys.Decrypt(parent, req).Do()
+	reqCall := h.CloudKMS.Projects.Locations.KeyRings.CryptoKeys.Decrypt(parent, req)
+	resp, err := reqCall.Do()
 	if err != nil {
 		return err
 	}
@@ -95,48 +100,32 @@ func (h *Handler) CreateSecret(cr *v1alpha1.SecretKMS) error {
 		return err
 	}
 
-	logrus.Infoln("Decrypted secret", string(b))
-
 	secret.Data = make(map[string][]byte)
 	secret.Data[cr.Spec.File] = b
 
 	return sdk.Create(secret)
 }
 
+// DeleteSecret is method for handling Delete events of SecretKMS resource
 func (h *Handler) DeleteSecret(cr *v1alpha1.SecretKMS) error {
-	return nil
-}
 
-// // newbusyBoxPod demonstrates how to create a busybox pod
-// func newbusyBoxPod(cr *v1alpha1.SecretKMS) *corev1.Pod {
-// 	labels := map[string]string{
-// 		"app": "busy-box",
-// 	}
-// 	return &corev1.Pod{
-// 		TypeMeta: metav1.TypeMeta{
-// 			Kind:       "Pod",
-// 			APIVersion: "v1",
-// 		},
-// 		ObjectMeta: metav1.ObjectMeta{
-// 			Name:      "busy-box",
-// 			Namespace: cr.Namespace,
-// 			OwnerReferences: []metav1.OwnerReference{
-// 				*metav1.NewControllerRef(cr, schema.GroupVersionKind{
-// 					Group:   v1alpha1.SchemeGroupVersion.Group,
-// 					Version: v1alpha1.SchemeGroupVersion.Version,
-// 					Kind:    "SecretKMS",
-// 				}),
-// 			},
-// 			Labels: labels,
-// 		},
-// 		Spec: corev1.PodSpec{
-// 			Containers: []corev1.Container{
-// 				{
-// 					Name:    "busybox",
-// 					Image:   "docker.io/busybox",
-// 					Command: []string{"sleep", "3600"},
-// 				},
-// 			},
-// 		},
-// 	}
-// }
+	logrus.Debugf("Deleting Secret from SecretKMS %s", cr.Name)
+
+	secret := &corev1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cr.Spec.Secret,
+			Namespace: cr.Namespace,
+		},
+	}
+
+	err := sdk.Delete(secret)
+	if errors.IsNotFound(err) {
+		return nil
+	}
+
+	return err
+}
