@@ -91,10 +91,3 @@ spec:
       key: test             # Name of the key
       data: CiQAFRg31wZQ1pHlR4bBAU8O7nrlz/QEkeKUyrLRsgD92CzIWxkSaQAJc5gIwtzhUZXW9vt1d3+oVl2i+l+tPrUMCN59zybemHro2Y6Gyzrgn0YQ2r3QDR1V+nFMcAvnsCgbInEELhJdXwH/SIRDIHCVVyQqlLr2xEmVXsZVdd3XVH2ivNFEP54XihkRBBaCCg==
 ```
-
-# TODO
-
-* [ ] - update of decrypted data
-* [ ] - implementation of AWS KMS provider
-* [ ] - create Helm chart for installation
-* [ ] - CLI for resource encryption
