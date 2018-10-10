@@ -11,7 +11,14 @@ spec:
       location: global  # kms location
       keyring: testring # name of the keyring
       key: test         # name of the key
-
-      # Data stored in Secret after successful decryption
-      # unencrypted data: dGhlIG1vc3Qgc2VjcmV0IHNlY3JldCBpbiB0aGUgd29ybGQgb2Ygc2VjcmV0cw==
       data: CiQAFRg31wZQ1pHlR4bBAU8O7nrlz/QEkeKUyrLRsgD92CzIWxkSaQAJc5gIwtzhUZXW9vt1d3+oVl2i+l+tPrUMCN59zybemHro2Y6Gyzrgn0YQ2r3QDR1V+nFMcAvnsCgbInEELhJdXwH/SIRDIHCVVyQqlLr2xEmVXsZVdd3XVH2ivNFEP54XihkRBBaCCg==
+
+---
+
+# Operator will decrypt data in resource above and following resource will be created in Kubernetes
+apiVersion: v1
+kind: Secret
+metadata: 
+  name: example-service-account
+data:
+  credentials.json: dGhlIG1vc3Qgc2VjcmV0IHNlY3JldCBpbiB0aGUgd29ybGQgb2Ygc2VjcmV0cw==

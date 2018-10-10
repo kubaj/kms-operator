@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: kms-operator
-        image: gcr.io/kubaj-public/kms-operator:latest
+        image: gcr.io/kubaj-public/kms-operator:0.1.0
         ports:
         - containerPort: 60000
           name: metrics
