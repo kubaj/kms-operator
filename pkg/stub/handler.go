@@ -4,27 +4,29 @@ import (
 	"context"
 	"fmt"
 
+	cloudkms "cloud.google.com/go/kms/apiv1"
 	"github.com/kubaj/kms-operator/pkg/apis/kubaj/v1alpha1"
-	cloudkms "google.golang.org/api/cloudkms/v1"
+	kmspb "google.golang.org/genproto/googleapis/cloud/kms/v1"
 
 	"encoding/base64"
 
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // NewHandler constructs Handler
-func NewHandler(cloudKMS *cloudkms.Service) sdk.Handler {
+func NewHandler(cloudKMS *cloudkms.KeyManagementClient) sdk.Handler {
 	return &Handler{
 		CloudKMS: cloudKMS,
 	}
 }
 
 type Handler struct {
-	CloudKMS *cloudkms.Service
+	CloudKMS *cloudkms.KeyManagementClient
 }
 
 // Handle is method for handling all watched events
@@ -66,7 +68,7 @@ func (h *Handler) CreateSecret(cr *v1alpha1.SecretKMS) error {
 		return nil
 	}
 
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !k8serrors.IsNotFound(err) {
 		return err
 	}
 
@@ -78,30 +80,26 @@ func (h *Handler) CreateSecret(cr *v1alpha1.SecretKMS) error {
 		cr.Spec.Provider.GoogleCloud.Keyring,
 		cr.Spec.Provider.GoogleCloud.Key)
 
-	req := &cloudkms.DecryptRequest{
-		Ciphertext: cr.Spec.Provider.GoogleCloud.Data,
+	b, err := base64.StdEncoding.DecodeString(cr.Spec.Provider.GoogleCloud.Data)
+	if err != nil {
+		return errors.Wrap(err, "malformed data in SecretKMS")
 	}
+
+	req := &kmspb.DecryptRequest{
+		Name:       parent,
+		Ciphertext: b,
+	}
+
+	logrus.Debugln("Data", cr.Spec.Provider.GoogleCloud.Data)
 
 	logrus.Debugln("Sending decrypt request")
-	reqCall := h.CloudKMS.Projects.Locations.KeyRings.CryptoKeys.Decrypt(parent, req)
-	resp, err := reqCall.Do()
-	if err != nil {
-		return err
-	}
-
-	// Base64 decode after KMS call
-	b, err := base64.StdEncoding.DecodeString(resp.Plaintext)
-	if err != nil {
-		return err
-	}
-
-	b, err = base64.StdEncoding.DecodeString(string(b))
+	resp, err := h.CloudKMS.Decrypt(context.Background(), req)
 	if err != nil {
 		return err
 	}
 
 	secret.Data = make(map[string][]byte)
-	secret.Data[cr.Spec.File] = b
+	secret.Data[cr.Spec.File] = resp.Plaintext
 
 	return sdk.Create(secret)
 }
@@ -123,7 +121,7 @@ func (h *Handler) DeleteSecret(cr *v1alpha1.SecretKMS) error {
 	}
 
 	err := sdk.Delete(secret)
-	if errors.IsNotFound(err) {
+	if k8serrors.IsNotFound(err) {
 		return nil
 	}
 

@@ -1,7 +1,7 @@
 module github.com/kubaj/kms-operator
 
 require (
-	cloud.google.com/go v0.28.0
+	cloud.google.com/go v0.30.0
 	github.com/PuerkitoBio/purell v1.1.0
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
 	github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973
@@ -17,6 +17,7 @@ require (
 	github.com/golang/protobuf v1.2.0
 	github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf
+	github.com/googleapis/gax-go v2.0.0+incompatible // indirect
 	github.com/googleapis/gnostic v0.2.0
 	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7
 	github.com/hashicorp/golang-lru v0.5.0
@@ -30,12 +31,14 @@ require (
 	github.com/operator-framework/operator-sdk v0.0.0-20181002232021-a7d30d0b475c
 	github.com/petar/GoLLRB v0.0.0-20130427215148-53be0d36a84c
 	github.com/peterbourgon/diskv v2.0.1+incompatible
+	github.com/pkg/errors v0.8.0
 	github.com/prometheus/client_golang v0.8.0
 	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910
 	github.com/prometheus/common v0.0.0-20180801064454-c7de2306084e
 	github.com/prometheus/procfs v0.0.0-20180920065004-418d78d0b9a7
 	github.com/sirupsen/logrus v1.1.0
 	github.com/spf13/pflag v1.0.3
+	go.opencensus.io v0.17.0 // indirect
 	golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4
 	golang.org/x/net v0.0.0-20181003013248-f5e5bdd77824
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
@@ -45,6 +48,8 @@ require (
 	golang.org/x/tools v0.0.0-20181003024731-2f84ea8ef872
 	google.golang.org/api v0.0.0-20181010000435-ce4acf611b39
 	google.golang.org/appengine v1.2.0
+	google.golang.org/genproto v0.0.0-20181016170114-94acd270e44e
+	google.golang.org/grpc v1.15.0 // indirect
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.2.1
 	k8s.io/api v0.0.0-20180712090710-2d6f90ab1293
