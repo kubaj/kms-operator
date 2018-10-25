@@ -1,0 +1,43 @@
+{{ if .Values.rbac }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "kms-operator.name" . }}
+  namespace: {{ .Release.Namespace }}
+
+---
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ include "kms-operator.name" . }}
+rules:
+- apiGroups:
+  - kubaj.kms
+  resources:
+  - "*"
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - "*"
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ include "kms-operator.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "kms-operator.name" . }}
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: {{ include "kms-operator.name" . }}
+  apiGroup: rbac.authorization.k8s.io
+
+{{ end }}

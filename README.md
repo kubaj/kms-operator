@@ -38,16 +38,17 @@ data:
 
 # Installation
 
-Cluster with RBAC enabled:
+You can use Helm to install the operator into the cluster:
+
 ```
 $ git clone https://github.com/kubaj/kms-operator.git
-$ kubectl apply -n kube-system -f kms-operator/deploy/operator_rbac.yaml
+$ helm install -n kms-operator --namespace kube-system ./helm/kms-operator
 ```
 
 Cluster with RBAC disabled (not recommended):
 ```
 $ git clone https://github.com/kubaj/kms-operator.git
-$ kubectl apply -n kube-system -f kms-operator/deploy/operator.yaml
+$ helm install -n kms-operator --namespace kube-system ./helm/kms-operator
 ```
 
 By default, Google Cloud provider is enabled, you have to create secret that contains Google Cloud service account with KMS decryption scope. To create secret from file:
@@ -56,6 +57,13 @@ By default, Google Cloud provider is enabled, you have to create secret that con
 $ kubectl create secret generic google-sa-kms -n kube-system --from-file=credentials.json=/path/to/service-account.json
 ```
 
+Installation can be customized by passing custom values to Helm. List of possible options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| rbac | true | Install RBAC resources |
+| googleCloud.enabled | true | Enable Google Cloud KMS provider |
+| googleCloud.svcAccountSecret | "google-sa-kms" | Name of the secret with Google Cloud Service Account (To use Default Service Account, pass "")
 
 # SecretKMS resource creation
 

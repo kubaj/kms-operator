@@ -1,0 +1,10 @@
+image:
+  repository: gcr.io/kubaj-public/kms-operator
+  tag: "0.1.1"
+  pullPolicy: IfNotPresent
+
+rbac: true
+
+googleCloud:
+  enabled: true
+  svcAccountSecret: google-sa-kms
